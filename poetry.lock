@@ -55,6 +55,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "psycopg2-binary"
+version = "2.9.9"
+description = "psycopg2 - Python-PostgreSQL Database Adapter"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "pycodestyle"
 version = "2.11.1"
 description = "Python style guide checker"
@@ -129,7 +137,7 @@ python-versions = ">=3.8"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11"
-content-hash = "608e36a6acce2c8ca7faa35dc50c118a6d3e0d63402e386aefad34bd51c81bac"
+content-hash = "43df76947a03081252c66cc420f7c49c7cbaf22196422e42172f9b99fcce36f4"
 
 [metadata.files]
 async-timeout = []
@@ -137,6 +145,7 @@ asyncpg = []
 flake8 = []
 greenlet = []
 mccabe = []
+psycopg2-binary = []
 pycodestyle = []
 pyflakes = []
 python-dotenv = []

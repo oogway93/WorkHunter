@@ -1,14 +1,16 @@
 from typing import Annotated
 
-from sqlalchemy import String
+from sqlalchemy import String, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-from config import async_link
+from config import async_link, link
 
-engine = create_async_engine(async_link, echo=True)
+engine = create_engine(link, echo=True)
+async_engine = create_async_engine(async_link, echo=True)
 
 session = sessionmaker(engine)
+async_session = sessionmaker(async_engine)
 
 str_256 = Annotated[str, String(256)]
 
