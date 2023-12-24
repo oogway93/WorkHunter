@@ -12,6 +12,9 @@ async def main():
     await AsyncORM.insert_worker()
     await AsyncORM.insert_resumes()
     await AsyncORM.select_worker_resumes()
+    await AsyncORM.insert_vacancies()
+    await AsyncORM.insert_vacancy_replies()
+    await AsyncORM.select_vacancy_replies()
 
 
 if __name__ == '__main__':

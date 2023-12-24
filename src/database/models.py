@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 
 from sqlalchemy import MetaData, text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -51,7 +51,7 @@ class Resume(Base):
     id: Mapped[intpk]
     worker_id: Mapped[int] = mapped_column(ForeignKey("worker.id"))
     title: Mapped[str_256]
-    salary: Mapped[int]
+    salary: Mapped[Optional[int]]
     specialization: Mapped[str_256]
     employment: Mapped[Employment]
     experience: Mapped[str_256]
@@ -61,4 +61,30 @@ class Resume(Base):
 
     worker: Mapped["Worker"] = relationship(back_populates="resume")
 
+    vacancy_replied: Mapped[list["Vacancy"]] = relationship(
+        back_populates="resume_replied",
+        secondary="vacancy_reply",
+    )
+
     repr_cols = ("salary",)
+
+
+class Vacancy(Base):
+    __tablename__ = 'vacancy'
+
+    id: Mapped[intpk]
+    title: Mapped[str_256]
+    salary: Mapped[Optional[int]]
+
+    resume_replied: Mapped[list["Resume"]] = relationship(
+        back_populates="vacancy_replied",
+        secondary="vacancy_reply",
+    )
+
+
+class VacancyReply(Base):
+    __tablename__ = 'vacancy_reply'
+
+    resume_id: Mapped[int] = mapped_column(ForeignKey("resume.id", ondelete="CASCADE"), primary_key=True)
+    vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancy.id", ondelete="CASCADE"), primary_key=True)
+    cover_letter: Mapped[Optional[str]]
