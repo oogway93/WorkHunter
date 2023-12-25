@@ -1,5 +1,5 @@
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy import select, or_
+from sqlalchemy.orm import selectinload, joinedload, contains_eager
 
 from src.database.database import Base, async_engine, async_session
 from src.database.models import Worker, Resume, Vacancy, VacancyReply
@@ -18,7 +18,8 @@ class AsyncORM:
         async with async_session() as session:
             worker_1 = Worker(first_name="Sergei", last_name="Isakov", sex="male")
             worker_2 = Worker(first_name="Veniamin", last_name="Alolov", sex="male")
-            session.add_all([worker_1, worker_2])
+            worker_3 = Worker(first_name="Ivan", last_name="Sulikov", sex="male")
+            session.add_all([worker_1, worker_2, worker_3])
             await session.commit()
 
     @staticmethod
@@ -36,7 +37,11 @@ class AsyncORM:
                               salary=30000, specialization="Программист, разработчик",
                               employment="full_time", experience="1 год",
                               work_type="combined")
-            session.add_all([resume_1, resume_2, resume_3])
+            resume_4 = Resume(worker_id=3, title="Слесарь",
+                              salary=30000, specialization="Слесарь",
+                              employment="part_time", experience="1 год",
+                              work_type="office")
+            session.add_all([resume_1, resume_2, resume_3, resume_4])
             await session.commit()
 
     @staticmethod
@@ -91,12 +96,18 @@ class AsyncORM:
             print(f"{result_dto=}")
             return result_dto
 
-
-    # @staticmethod
-    # async def convert_workers_with_options():
-    #     async with async_session() as session:
-    #         query = (
-    #             select()
-    #         )
-
-
+    @staticmethod
+    async def convert_workers_with_options_to_dto(specialization: str, experience: str):
+        async with async_session() as session:
+            query = (
+                select(Worker)
+                .join(Worker.resume)
+                .options(contains_eager(Worker.resume))
+                .filter(or_(Resume.specialization == specialization, Resume.experience == experience))
+            )
+            res = await session.execute(query)
+            result = res.unique().scalars().all()
+            print(f"{result=}")
+            result_dto = [WorkerRelDTO.model_validate(row, from_attributes=True) for row in result]
+            print(f"{result_dto=}")
+            return result_dto
