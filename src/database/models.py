@@ -40,9 +40,10 @@ class Employment(enum.Enum):
     project_work = "project_work"
 
 
-class Schedule(enum.Enum):
-    full_time = "full_time"
+class WorkType(enum.Enum):
     remote = "remote"
+    office = "office"
+    combined = "combined"
 
 
 class Resume(Base):
@@ -55,7 +56,7 @@ class Resume(Base):
     specialization: Mapped[str_256]
     employment: Mapped[Employment]
     experience: Mapped[str_256]
-    schedule: Mapped[Schedule]
+    work_type: Mapped[WorkType]
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 
