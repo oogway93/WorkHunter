@@ -97,14 +97,27 @@ class AsyncORM:
             return result_dto
 
     @staticmethod
-    async def convert_workers_with_options_to_dto(specialization: str, experience: str):
+    async def convert_workers_with_options_to_dto(specialization: str, experience, work_type: str):
         async with async_session() as session:
-            query = (
-                select(Worker)
-                .join(Worker.resume)
-                .options(contains_eager(Worker.resume))
-                .filter(or_(Resume.specialization == specialization, Resume.experience == experience))
-            )
+            d = {'no experience': ['0', '0'], 'from 1 to 3 years': ['1', '3'], 'from 3 to 6 years': ['3', '6'],
+                 'greater 6 years': ['6', '100']}
+            n1, n2 = d.get(experience.value)[0], d.get(experience.value)[1]
+            if any([specialization, experience, work_type]):
+                query = (
+                    select(Worker)
+                    .join(Worker.resume)
+                    .options(contains_eager(Worker.resume))
+                    .filter(
+                        or_(Resume.specialization == specialization,
+                            Resume.experience.between(n1, n2),
+                            Resume.work_type == work_type))
+                )
+            else:
+                query = (
+                    select(Worker)
+                    .join(Worker.resume)
+                    .options(contains_eager(Worker.resume))
+                )
             res = await session.execute(query)
             result = res.unique().scalars().all()
             print(f"{result=}")
