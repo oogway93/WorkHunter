@@ -46,7 +46,7 @@ class WorkType(enum.Enum):
     combined = "combined"
 
 
-class Experience(enum.Enum):
+class ExperienceFilter(enum.Enum):
     no_experience = "no experience"
     from_1_to_3 = "from 1 to 3 years"
     from_3_to_6 = "from 3 to 6 years"
@@ -62,7 +62,7 @@ class Resume(Base):
     salary: Mapped[Optional[int]]
     specialization: Mapped[str_256]
     employment: Mapped[Employment]
-    experience: Mapped[str_256]
+    experience: Mapped[int]
     work_type: Mapped[WorkType]
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
