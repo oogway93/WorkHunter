@@ -3,7 +3,8 @@ from sqlalchemy.orm import selectinload, joinedload, contains_eager
 
 from src.database.database import Base, async_engine, async_session
 from src.database.models import Worker, Resume, Vacancy, VacancyReply
-from src.database.schemas import WorkerRelDTO
+from src.database.schemas import WorkerRelDTO, ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO, \
+    ResumesRelVacanciesRepliedDTO, VacanciesWithoutCompensationDTO, VacanciesDTO
 
 
 class AsyncORM:
@@ -188,3 +189,44 @@ class AsyncORM:
                               work_type=work_type)
             session.add(resume_1)
             await session.commit()
+
+    @staticmethod
+    async def add_vacancies_and_replies(title: str, salary: int):
+        async with async_session() as session:
+            vacancy = Vacancy(title=title, salary=salary)
+            get_resume = select(Resume).options(selectinload(Resume.vacancy_replied)).filter_by(id=1)
+            get_resume2 = select(Resume).options(selectinload(Resume.vacancy_replied)).filter_by(id=2)
+            resume_1 = (await session.execute(get_resume)).scalar_one()
+            resume_2 = (await session.execute(get_resume2)).scalar_one()
+            resume_1.vacancy_replied.append(vacancy)
+            resume_2.vacancy_replied.append(vacancy)
+            await session.commit()
+
+    @staticmethod
+    async def select_vacancies():
+        async with async_session() as session:
+            query = (
+                select(Vacancy)
+            )
+            res = await session.execute(query)
+            result = res.unique().scalars().all()
+            print(f"{result=}")
+            return result
+
+    @staticmethod
+    async def select_resumes_with_all_relationships():
+        async with async_session() as session:
+            query = (
+                select(Resume)
+                .options(joinedload(Resume.worker))
+                .options(selectinload(Resume.vacancy_replied).load_only(Vacancy.title))
+            )
+
+            res = await session.execute(query)
+            result_orm = res.unique().scalars().all()
+            print(f"{result_orm=}")
+            result_dto = [
+                ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO.model_validate(row, from_attributes=True) for
+                row in result_orm]
+            print(f"{result_dto=}")
+            return result_dto

@@ -1,10 +1,13 @@
-from typing import Annotated
+from typing import Annotated, AsyncGenerator
 
+from fastapi import Depends
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase, SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseUserTable
 from sqlalchemy import String, create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped
 
 from config import async_link, link
+from src.database.models import intpk
 
 engine = create_engine(link, echo=True)
 async_engine = create_async_engine(async_link, echo=True)
@@ -30,3 +33,15 @@ class Base(DeclarativeBase):
                 cols.append(f"{col}={getattr(self, col)}")
 
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
+
+
+
+
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session
+
+
+async def get_user_db(session: AsyncSession = Depends(get_async_session)):
+    yield SQLAlchemyUserDatabase(session, User)

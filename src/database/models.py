@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 from typing import Annotated, List, Optional
 
-from sqlalchemy import MetaData, text, ForeignKey
+from sqlalchemy import MetaData, text, ForeignKey, Index, CheckConstraint, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database.database import Base, str_256
@@ -75,6 +75,11 @@ class Resume(Base):
     )
 
     repr_cols = ("salary",)
+
+    _table_args__ = (
+        Index("title_index", "title"),
+        CheckConstraint("salary > 0", name="check_salary_positive"),
+    )
 
 
 class Vacancy(Base):

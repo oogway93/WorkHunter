@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -20,6 +21,7 @@ class ResumeAddDTO(BaseModel):
     salary: int
     specialization: str
     employment: Employment
+    experience: int
     work_type: WorkType
 
 
@@ -36,3 +38,26 @@ class ResumeRelDTO(ResumeDTO):
 class WorkerRelDTO(WorkerDTO):
     resume: list["ResumeDTO"]
 
+
+class VacanciesAddDTO(BaseModel):
+    title: str
+    salary: int
+
+
+class VacanciesDTO(VacanciesAddDTO):
+    id: int
+
+
+class VacanciesWithoutCompensationDTO(BaseModel):
+    id: int
+    title: str
+
+
+class ResumesRelVacanciesRepliedDTO(ResumeDTO):
+    worker: "WorkerDTO"
+    vacancy_replied: List["VacanciesDTO"]
+
+
+class ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO(ResumeDTO):
+    worker: "WorkerDTO"
+    vacancy_replied: List["VacanciesWithoutCompensationDTO"]
