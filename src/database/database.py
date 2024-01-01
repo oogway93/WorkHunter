@@ -1,7 +1,7 @@
 from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends
-from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase, SQLAlchemyBaseUserTableUUID, SQLAlchemyBaseUserTable
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase, SQLAlchemyBaseUserTable
 from sqlalchemy import String, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped
@@ -35,7 +35,8 @@ class Base(DeclarativeBase):
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
 
 
-
+class User(SQLAlchemyBaseUserTable[int], Base):
+    id: Mapped[intpk]
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
