@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse, Response
 
 from src.database.models import WorkType, ExperienceFilter, Employment
@@ -36,13 +36,13 @@ async def creation_vacancy(title: str, salary: int):
     return JSONResponse(status_code=201, content={"msg": "Created!"})
 
 
-@router.get("/select_vacancies")
+@router.get("/vacancies")
 async def select_avaible_vacancies():
     vacancies = await AsyncORM.select_vacancies()
     return vacancies
 
 
-@router.get("/select_replied_vacancies")
+@router.get("/replied_vacancies")
 async def selecr_replied_vacancies():
-    vacancies = await AsyncORM.select_resumes_with_all_relationships()
-    return vacancies
+    rel_vacancies = await AsyncORM.select_resumes_with_all_relationships()
+    return rel_vacancies
