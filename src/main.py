@@ -2,14 +2,17 @@ import asyncio
 import os
 import sys
 
+import aioredis
 from fastapi import FastAPI, Depends
 import uvicorn
+from fastapi_cache import FastAPICache
 from fastapi_users import FastAPIUsers
+from fastapi_cache.backends.redis import RedisBackend
 
 from src.auth.database import User
 from src.auth.auth import auth_backend
 from src.auth.manager import get_user_manager
-from src.auth.schemas import UserRead, UserCreate
+from src.auth.schemas import UserRead, UserCreate, UserUpdate
 from src.database.queries.orm import AsyncORM
 from src.api.api import api_router
 
@@ -32,8 +35,21 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
 
 current_user = fastapi_users.current_user(active=True, verified=True)
+
+
+@app.on_event(event_type="startup")
+async def startup():
+    redis = aioredis.from_url(
+        "redis://localhost", encoding="utf8", decode_responses=True
+    )
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 async def main():

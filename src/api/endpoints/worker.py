@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse, Response
+from fastapi_cache.decorator import cache
 
 from src.database.models import WorkType, ExperienceFilter, Employment
 from src.database.queries.orm import AsyncORM
@@ -8,12 +9,14 @@ router = APIRouter()
 
 
 @router.get("/workers")
+@cache(expire=30)
 async def getting_workers_from_db():
     workers = await AsyncORM.convert_workers_to_dto()
     return workers
 
 
 @router.get("/resumes_filtration")
+@cache(expire=30)
 async def getting_resumes_due_filters(specialization: str = None, experience: ExperienceFilter = None,
                                       work_type: WorkType = None):
     workers = await AsyncORM.convert_workers_with_options_to_dto(specialization, experience, work_type)
@@ -37,12 +40,14 @@ async def creation_vacancy(title: str, salary: int):
 
 
 @router.get("/vacancies")
-async def select_avaible_vacancies():
+@cache(expire=30)
+async def select_available_vacancies():
     vacancies = await AsyncORM.select_vacancies()
     return vacancies
 
 
 @router.get("/replied_vacancies")
-async def selecr_replied_vacancies():
+@cache(expire=30)
+async def select_replied_vacancies():
     rel_vacancies = await AsyncORM.select_resumes_with_all_relationships()
     return rel_vacancies

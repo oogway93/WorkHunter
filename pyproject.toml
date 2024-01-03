@@ -1,19 +1,21 @@
 [tool.poetry]
-name = "WorkHunter"
+name = "workhunter"
 version = "0.1.0"
 description = ""
 authors = ["oogway93 <marklem.coding.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
-SQLAlchemy = "^2.0.23"
-flake8 = "^6.1.0"
+python = "^3.10"
+fastapi = "^0.108.0"
+SQLAlchemy = "^2.0.25"
+fastapi-cache2 = "^0.2.1"
 python-dotenv = "^1.0.0"
-asyncpg = "^0.29.0"
-psycopg2-binary = "^2.9.9"
-fastapi = "^0.105.0"
-uvicorn = "^0.25.0"
+aioredis = "^2.0.1"
+fastapi-users = "^12.1.2"
 fastapi-users-db-sqlalchemy = "^6.0.1"
+redis = "^5.0.1"
+psycopg2-binary = "^2.9.9"
+asyncpg = "^0.29.0"
 
 [tool.poetry.dev-dependencies]
 

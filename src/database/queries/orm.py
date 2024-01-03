@@ -2,7 +2,7 @@ from sqlalchemy import select, or_, insert, and_, text
 from sqlalchemy.orm import selectinload, joinedload, contains_eager
 
 from src.database.database import Base, async_engine, async_session
-from src.database.models import Worker, Resume, Vacancy, VacancyReply
+from src.database.models import Worker, Resume, Vacancy, VacancyReply, WorkType
 from src.database.schemas import WorkerRelDTO, ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO, \
     ResumesRelVacanciesRepliedDTO, VacanciesWithoutCompensationDTO, VacanciesDTO
 
@@ -103,7 +103,7 @@ class AsyncORM:
             return result_dto
 
     @staticmethod
-    async def convert_workers_with_options_to_dto(specialization: str, experience, work_type: str):
+    async def convert_workers_with_options_to_dto(specialization: str, experience, work_type: WorkType):
         async with async_session() as session:
             d = {'no experience': [0, 0], 'from 1 to 3 years': [1, 3], 'from 3 to 6 years': [3, 6],
                  'greater 6 years': [6, 100]}
