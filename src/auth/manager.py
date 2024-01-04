@@ -3,10 +3,12 @@ from typing import Optional, Union, Dict, Any
 from fastapi import Depends, Request
 from fastapi.openapi.models import Response
 from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
+from fastapi_users.jwt import generate_jwt
 
 from auth.schemas import UserCreate
 from config import RESET_SECRET
 from src.auth.database import User, get_user_db
+from tasks.tasks import send_email
 
 SECRET = RESET_SECRET
 
@@ -17,6 +19,19 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
+        token_data = {
+            "user_id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "aud": self.verification_token_audience,
+        }
+        token = generate_jwt(
+            token_data,
+            self.verification_token_secret,
+            self.verification_token_lifetime_seconds,
+        )
+        send_email("Email Confirmation", user.email, token, user.username)
+        return {"msg": "Let's check an email address"}
 
     async def on_after_forgot_password(
             self, user: User, token: str, request: Optional[Request] = None
@@ -28,19 +43,19 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
-    async def validate_password(
-            self,
-            password: str,
-            user: Union[UserCreate, User],
-    ) -> None:
-        if len(password) < 8:
-            raise InvalidPasswordException(
-                reason="Password should be at least 8 characters"
-            )
-        if user.email in password:
-            raise InvalidPasswordException(
-                reason="Password should not contain e-mail"
-            )
+    # async def validate_password(
+    #         self,
+    #         password: str,
+    #         user: Union[UserCreate, User],
+    # ) -> None:
+    #     if len(password) < 8:
+    #         raise InvalidPasswordException(
+    #             reason="Password should be at least 8 characters"
+    #         )
+    #     if user.email in password:
+    #         raise InvalidPasswordException(
+    #             reason="Password should not contain e-mail"
+    #         )
 
     async def on_after_update(
             self,

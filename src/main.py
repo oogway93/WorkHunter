@@ -9,6 +9,7 @@ from fastapi_cache import FastAPICache
 from fastapi_users import FastAPIUsers
 from fastapi_cache.backends.redis import RedisBackend
 
+from config import REDIS_PORT
 from src.auth.database import User
 from src.auth.auth import auth_backend
 from src.auth.manager import get_user_manager
@@ -47,7 +48,7 @@ current_user = fastapi_users.current_user(active=True, verified=True)
 @app.on_event(event_type="startup")
 async def startup():
     redis = aioredis.from_url(
-        "redis://localhost", encoding="utf8", decode_responses=True
+        f"redis://localhost:{REDIS_PORT}", encoding="utf8", decode_responses=True
     )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
