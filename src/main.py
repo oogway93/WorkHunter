@@ -2,23 +2,23 @@ import asyncio
 import os
 import sys
 
-import aioredis
-from fastapi import FastAPI, Depends
-import uvicorn
+from fastapi import FastAPI
 from fastapi_cache import FastAPICache
-from fastapi_users import FastAPIUsers
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi_users import FastAPIUsers
+import aioredis
+import uvicorn
 
 from config import REDIS_PORT
-from src.auth.database import User
-from src.auth.auth import auth_backend
-from src.auth.manager import get_user_manager
-from src.auth.schemas import UserRead, UserCreate, UserUpdate
-from src.database.queries.orm import AsyncORM
 from src.api.api import api_router
+from src.auth.auth import auth_backend
+from src.auth.database import User
+from src.auth.manager import get_user_manager
+from src.auth.schemas import UserCreate
+from src.auth.schemas import UserRead
 from src.database.database import Base
 
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
 app = FastAPI()
 
@@ -54,13 +54,15 @@ async def startup():
 
 
 async def main():
-    await AsyncORM.create_tables()
-    await AsyncORM.insert_worker()
-    await AsyncORM.insert_resumes()
-    await AsyncORM.insert_vacancies()
-    await AsyncORM.insert_vacancy_replies()
+    # await AsyncORM.create_tables()
+    # await AsyncORM.insert_worker()
+    # await AsyncORM.insert_resumes()
+    # await AsyncORM.insert_vacancies()
+    # await AsyncORM.insert_vacancy_replies()
+    # await AsyncORM.select_resumes()
+    pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())
     uvicorn.run("src.main:app", reload=True)
