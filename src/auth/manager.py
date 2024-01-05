@@ -5,10 +5,10 @@ from fastapi.openapi.models import Response
 from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
 from fastapi_users.jwt import generate_jwt
 
-from auth.schemas import UserCreate
+from src.auth.schemas import UserCreate
 from config import RESET_SECRET
 from src.auth.database import User, get_user_db
-from tasks.tasks import send_registration_email, send_reset_email
+from src.tasks.tasks import send_registration_email, send_reset_email
 
 SECRET = RESET_SECRET
 

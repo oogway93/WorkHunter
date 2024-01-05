@@ -8,7 +8,6 @@ import uvicorn
 from fastapi_cache import FastAPICache
 from fastapi_users import FastAPIUsers
 from fastapi_cache.backends.redis import RedisBackend
-from starlette.middleware.authentication import AuthenticationMiddleware
 
 from config import REDIS_PORT
 from src.auth.database import User
@@ -17,6 +16,7 @@ from src.auth.manager import get_user_manager
 from src.auth.schemas import UserRead, UserCreate, UserUpdate
 from src.database.queries.orm import AsyncORM
 from src.api.api import api_router
+from src.database.database import Base
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
