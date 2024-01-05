@@ -8,6 +8,7 @@ import uvicorn
 from fastapi_cache import FastAPICache
 from fastapi_users import FastAPIUsers
 from fastapi_cache.backends.redis import RedisBackend
+from starlette.middleware.authentication import AuthenticationMiddleware
 
 from config import REDIS_PORT
 from src.auth.database import User
@@ -20,7 +21,6 @@ from src.api.api import api_router
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 app = FastAPI()
-app.include_router(api_router)
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
@@ -42,7 +42,7 @@ app.include_router(
     tags=["auth"],
 )
 
-current_user = fastapi_users.current_user(active=True, verified=True)
+app.include_router(api_router)
 
 
 @app.on_event(event_type="startup")

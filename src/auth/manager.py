@@ -8,7 +8,7 @@ from fastapi_users.jwt import generate_jwt
 from auth.schemas import UserCreate
 from config import RESET_SECRET
 from src.auth.database import User, get_user_db
-from tasks.tasks import send_email
+from tasks.tasks import send_registration_email, send_reset_email
 
 SECRET = RESET_SECRET
 
@@ -30,13 +30,15 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             self.verification_token_secret,
             self.verification_token_lifetime_seconds,
         )
-        send_email("Email Confirmation", user.email, token, user.username)
+        send_registration_email("Email Confirmation", user.email, token, user.username)
         return {"msg": "Let's check an email address"}
 
     async def on_after_forgot_password(
             self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
+        send_reset_email("Reset Password", user.email, token)
+        return {"msg": "Let's check an email address"}
 
     async def on_after_request_verify(
             self, user: User, token: str, request: Optional[Request] = None
