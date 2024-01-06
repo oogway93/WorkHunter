@@ -1,13 +1,22 @@
-from typing import Any, Dict, Optional
+from typing import Any
+from typing import Dict
+from typing import Optional
+from typing import Union
 
-from fastapi import Depends, Request
+from fastapi import Depends
+from fastapi import Request
 from fastapi.openapi.models import Response
-from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
+from fastapi_users import BaseUserManager
+from fastapi_users import IntegerIDMixin
+from fastapi_users import InvalidPasswordException
 from fastapi_users.jwt import generate_jwt
 
+from auth.schemas import UserCreate
 from config import RESET_SECRET
-from src.auth.database import User, get_user_db
-from src.tasks.tasks import send_registration_email, send_reset_email
+from src.auth.database import User
+from src.auth.database import get_user_db
+from src.tasks.tasks import send_registration_email
+from src.tasks.tasks import send_reset_email
 
 SECRET = RESET_SECRET
 
@@ -46,19 +55,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
-    # async def validate_password(
-    #         self,
-    #         password: str,
-    #         user: Union[UserCreate, User],
-    # ) -> None:
-    #     if len(password) < 8:
-    #         raise InvalidPasswordException(
-    #             reason="Password should be at least 8 characters"
-    #         )
-    #     if user.email in password:
-    #         raise InvalidPasswordException(
-    #             reason="Password should not contain e-mail"
-    #         )
+    async def validate_password(
+        self,
+        password: str,
+        user: Union[UserCreate, User],
+    ) -> None:
+        if len(password) < 8:
+            raise InvalidPasswordException(
+                reason="Password should be at least 8 characters"
+            )
+        if user.email in password:
+            raise InvalidPasswordException(reason="Password should not contain e-mail")
 
     async def on_after_update(
         self,

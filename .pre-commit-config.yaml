@@ -8,7 +8,7 @@ repos:
     rev: 6.1.0
     hooks:
       - id: flake8
-        args: [ "--ignore=W503,W605,D107,D102,I100,D100,D103,F401,I201,IS001" ]
+        args: [ "--ignore=W503,W605,D107,D102,I100,D100,D103,F401,I201,D105,A003,D101" ]
         additional_dependencies:
           - flake8-import-order
           - flake8-import-single==0.1.5

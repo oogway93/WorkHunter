@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import List
 
 from pydantic import BaseModel
 
-from src.database.models import Sex, Employment, WorkType
+from src.database.models import Employment
+from src.database.models import Sex
+from src.database.models import WorkType
 
 
 class WorkerAddDTO(BaseModel):

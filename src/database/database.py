@@ -1,12 +1,14 @@
-from typing import Annotated, AsyncGenerator
+from typing import Annotated
 
-from fastapi import Depends
-from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase, SQLAlchemyBaseUserTable, SQLAlchemyBaseUserTableUUID
-from sqlalchemy import String, create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String
+from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import sessionmaker
 
-from config import async_link, link
+from config import async_link
+from config import link
 
 engine = create_engine(link, echo=True)
 async_engine = create_async_engine(async_link, echo=True)
@@ -18,9 +20,9 @@ str_256 = Annotated[str, String(256)]
 
 
 class Base(DeclarativeBase):
-    type_annotation_map = {
-        str_256: String(256)
-    }
+    """Declarative Base Class."""
+
+    type_annotation_map = {str_256: String(256)}
 
     repr_cols_num = 3
     repr_cols = tuple()

@@ -304,21 +304,3 @@ class AsyncORM:
             ]
             print(f"{result_dto[0]=}")
             return result_dto
-
-    # @staticmethod
-    # async def select_resumes():
-    #     async with async_session() as session:
-    #         stmt = (
-    #             select(Resume)
-    #             .options(joinedload(Resume.worker))
-    #             .options(selectinload(Resume.vacancy_replied))
-    #         )
-    #
-    #         res = await session.execute(stmt)
-    #         result_orm = res.unique().scalars().all()
-    #         print(f"{result_orm[0]=}")
-    #         result_dto = [
-    #             ResumesRelVacanciesRepliedDTO.model_validate(row, from_attributes=True) for
-    #             row in result_orm]
-    #         print(f"{result_dto[0]=}")
-    #         return result_dto
