@@ -1,11 +1,10 @@
-from typing import Optional, Union, Dict, Any
+from typing import Any, Dict, Optional
 
 from fastapi import Depends, Request
 from fastapi.openapi.models import Response
 from fastapi_users import BaseUserManager, IntegerIDMixin, InvalidPasswordException
 from fastapi_users.jwt import generate_jwt
 
-from src.auth.schemas import UserCreate
 from config import RESET_SECRET
 from src.auth.database import User, get_user_db
 from src.tasks.tasks import send_registration_email, send_reset_email
@@ -14,6 +13,8 @@ SECRET = RESET_SECRET
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
+    """User Manager."""
+
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -34,14 +35,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         return {"msg": "Let's check an email address"}
 
     async def on_after_forgot_password(
-            self, user: User, token: str, request: Optional[Request] = None
+        self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
         send_reset_email("Reset Password", user.email, token)
         return {"msg": "Let's check an email address"}
 
     async def on_after_request_verify(
-            self, user: User, token: str, request: Optional[Request] = None
+        self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
@@ -60,18 +61,18 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     #         )
 
     async def on_after_update(
-            self,
-            user: User,
-            update_dict: Dict[str, Any],
-            request: Optional[Request] = None,
+        self,
+        user: User,
+        update_dict: Dict[str, Any],
+        request: Optional[Request] = None,
     ):
         print(f"User {user.id} has been updated with {update_dict}.")
 
     async def on_after_login(
-            self,
-            user: User,
-            request: Optional[Request] = None,
-            response: Optional[Response] = None,
+        self,
+        user: User,
+        request: Optional[Request] = None,
+        response: Optional[Response] = None,
     ):
         print(f"User {user.id} logged in.")
 

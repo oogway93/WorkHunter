@@ -65,4 +65,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-    uvicorn.run("src.main:app", reload=True)
+    uvicorn.run("src.core:app", reload=True)

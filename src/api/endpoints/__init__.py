@@ -1,1 +1,1 @@
-from . import auth, main, worker
+from . import auth, main_page, worker
