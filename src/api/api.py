@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from endpoints import main_page
-from endpoints import worker
 
+from .endpoints import main_page
+from .endpoints import worker
 
 api_router = APIRouter()
 

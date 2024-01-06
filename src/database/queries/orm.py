@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import and_
 from sqlalchemy import or_
 from sqlalchemy import select
@@ -5,14 +7,14 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import selectinload
 
+from src.database.database import Base
 from src.database.database import async_engine
 from src.database.database import async_session
-from src.database.database import Base
 from src.database.models import Resume
 from src.database.models import Vacancy
 from src.database.models import VacancyReply
-from src.database.models import Worker
 from src.database.models import WorkType
+from src.database.models import Worker
 from src.database.schemas import ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO
 from src.database.schemas import VacanciesAddDTO
 from src.database.schemas import WorkerRelDTO
@@ -94,7 +96,8 @@ class AsyncORM:
             stmt = select(Worker).options(selectinload(Worker.resume))
             res = await session.execute(stmt)
             result = res.unique().scalars().all()
-            print(result[0].resume)
+            # print(result[0].resume)
+            logging.info(result)
 
     @staticmethod
     async def insert_vacancies():
@@ -121,7 +124,8 @@ class AsyncORM:
             stmt = select(Resume).join(Resume.vacancy_replied)
             res = await session.execute(stmt)
             result = res.unique().scalars().all()
-            print(result[0])
+            # print(result[0])
+            logging.info(result[0])
 
     @staticmethod
     async def convert_workers_to_dto():
