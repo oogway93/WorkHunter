@@ -2,21 +2,21 @@ import asyncio
 import os
 import sys
 
+import aioredis
+import uvicorn
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_users import FastAPIUsers
-import aioredis
-import uvicorn
 
-from config import REDIS_PORT
+from config import REDIS_HOST
 from src.api.api import api_router
 from src.auth.auth import auth_backend
 from src.auth.database import User
 from src.auth.manager import get_user_manager
 from src.auth.schemas import UserCreate
 from src.auth.schemas import UserRead
-from src.database.database import Base
+from src.database.queries.orm import AsyncORM
 
 sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
@@ -48,19 +48,17 @@ app.include_router(api_router)
 @app.on_event(event_type="startup")
 async def startup():
     redis = aioredis.from_url(
-        f"redis://localhost:{REDIS_PORT}", encoding="utf8", decode_responses=True
+        f"redis://{REDIS_HOST}:6379", encoding="utf8", decode_responses=True
     )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 async def main():
-    # await AsyncORM.create_tables()
-    # await AsyncORM.insert_worker()
-    # await AsyncORM.insert_resumes()
-    # await AsyncORM.insert_vacancies()
-    # await AsyncORM.insert_vacancy_replies()
-    # await AsyncORM.select_resumes()
-    pass
+    await AsyncORM.create_tables()
+    await AsyncORM.insert_worker()
+    await AsyncORM.insert_resumes()
+    await AsyncORM.insert_vacancies()
+    await AsyncORM.insert_vacancy_replies()
 
 
 if __name__ == "__main__":

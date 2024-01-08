@@ -1,0 +1,63 @@
+version: "3.10"
+
+services:
+  webapp:
+    restart: always
+    container_name: webapp
+    build: ./
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+    command: "uvicorn src.core:app --reload --host 0.0.0.0"
+    networks:
+      - db_net
+    env_file:
+      - ./.env
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6374:6379"
+    env_file:
+      - ./.env
+    networks:
+      - db_net
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "python3 -m celery -A src.tasks.tasks:celery worker -l info"
+    depends_on:
+      - webapp
+      - redis
+      - postgres
+    restart: on-failure
+    #    env_file:
+    #      - ./.env
+    networks:
+      - db_net
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    ports:
+      - "5431:5432"
+    networks:
+      - db_net
+
+volumes:
+  postgres_data:
+networks:
+  db_net:
