@@ -1,5 +1,3 @@
-import logging
-
 from sqlalchemy import and_
 from sqlalchemy import or_
 from sqlalchemy import select
@@ -10,9 +8,8 @@ from sqlalchemy.orm import selectinload
 from src.database.database import Base
 from src.database.database import async_engine
 from src.database.database import async_session
-from src.database.models import Resume
+from src.database.models import Resume, Sex, VacancyReply
 from src.database.models import Vacancy
-from src.database.models import VacancyReply
 from src.database.models import WorkType
 from src.database.models import Worker
 from src.database.schemas import ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO
@@ -26,69 +23,67 @@ class AsyncORM:
     @staticmethod
     async def create_tables():
         async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
+            # await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
-    async def insert_worker():
+    async def insert_worker(first_name: str, last_name: str, sex: Sex):
         async with async_session() as session:
-            worker_1 = Worker(first_name="Sergei", last_name="Isakov", sex="male")
-            worker_2 = Worker(first_name="Veniamin", last_name="Alolov", sex="male")
-            worker_3 = Worker(first_name="Ivan", last_name="Sulikov", sex="male")
-            worker_4 = Worker(first_name="Lera", last_name="Samoylova", sex="female")
-            session.add_all([worker_1, worker_2, worker_3, worker_4])
+            worker = Worker(first_name=first_name, last_name=last_name, sex=sex)
+            session.add(worker)
             await session.commit()
 
-    @staticmethod
-    async def insert_resumes():
-        async with async_session() as session:
-            resume_1 = Resume(
-                worker_id=1,
-                title="DJANGO Python Разработчик",
-                salary=80000,
-                specialization="Программист, разработчик",
-                employment="full_time",
-                experience=1,
-                work_type="remote",
-            )
-            resume_2 = Resume(
-                worker_id=1,
-                title="Отдел по продажам",
-                salary=30000,
-                specialization="Связист",
-                employment="part_time",
-                experience=5,
-                work_type="remote",
-            )
-            resume_3 = Resume(
-                worker_id=2,
-                title="Frontend Разработчик CSS/HTML/JS",
-                salary=30000,
-                specialization="Программист, разработчик",
-                employment="full_time",
-                experience=1,
-                work_type="combined",
-            )
-            resume_4 = Resume(
-                worker_id=3,
-                title="Слесарь",
-                salary=30000,
-                specialization="Слесарь",
-                employment="part_time",
-                experience=1,
-                work_type="office",
-            )
-            resume_5 = Resume(
-                worker_id=4,
-                title="DJANGO + FastAPI Python Разработчик",
-                salary=200000,
-                specialization="Программист, разработчик",
-                employment="full_time",
-                experience=8,
-                work_type="combined",
-            )
-            session.add_all([resume_1, resume_2, resume_3, resume_4, resume_5])
-            await session.commit()
+    #
+    # @staticmethod
+    # async def insert_resumes():
+    #     async with async_session() as session:
+    #         resume_1 = Resume(
+    #             worker_id=1,
+    #             title="DJANGO Python Разработчик",
+    #             salary=80000,
+    #             specialization="Программист, разработчик",
+    #             employment="full_time",
+    #             experience=1,
+    #             work_type="remote",
+    #         )
+    #         resume_2 = Resume(
+    #             worker_id=1,
+    #             title="Отдел по продажам",
+    #             salary=30000,
+    #             specialization="Связист",
+    #             employment="part_time",
+    #             experience=5,
+    #             work_type="remote",
+    #         )
+    #         resume_3 = Resume(
+    #             worker_id=2,
+    #             title="Frontend Разработчик CSS/HTML/JS",
+    #             salary=30000,
+    #             specialization="Программист, разработчик",
+    #             employment="full_time",
+    #             experience=1,
+    #             work_type="combined",
+    #         )
+    #         resume_4 = Resume(
+    #             worker_id=3,
+    #             title="Слесарь",
+    #             salary=30000,
+    #             specialization="Слесарь",
+    #             employment="part_time",
+    #             experience=1,
+    #             work_type="office",
+    #         )
+    #         resume_5 = Resume(
+    #             worker_id=4,
+    #             title="DJANGO + FastAPI Python Разработчик",
+    #             salary=200000,
+    #             specialization="Программист, разработчик",
+    #             employment="full_time",
+    #             experience=8,
+    #             work_type="combined",
+    #         )
+    #         session.add_all([resume_1, resume_2, resume_3, resume_4, resume_5])
+    #         await session.commit()
 
     @staticmethod
     async def select_worker_resumes():
@@ -96,26 +91,17 @@ class AsyncORM:
             stmt = select(Worker).options(selectinload(Worker.resume))
             res = await session.execute(stmt)
             result = res.unique().scalars().all()
-            # print(result[0].resume)
-            logging.info(result)
-
-    @staticmethod
-    async def insert_vacancies():
-        async with async_session() as session:
-            vacancy_1 = Vacancy(title="Junior Python Разработчик", salary=50000)
-            vacancy_2 = Vacancy(title="Слесарь", salary=30000)
-            session.add_all([vacancy_1, vacancy_2])
-            await session.commit()
+            return result
 
     @staticmethod
     async def insert_vacancy_replies():
         async with async_session() as session:
-            vacancy_reply_1 = VacancyReply(
+            vacancy_reply = VacancyReply(
                 resume_id=1,
                 vacancy_id=1,
                 cover_letter="Здравствуйте, буду рад присоединиться к вам в команду",
             )
-            session.add(vacancy_reply_1)
+            session.add(vacancy_reply)
             await session.commit()
 
     @staticmethod
@@ -124,8 +110,7 @@ class AsyncORM:
             stmt = select(Resume).join(Resume.vacancy_replied)
             res = await session.execute(stmt)
             result = res.unique().scalars().all()
-            # print(result[0])
-            logging.info(result[0])
+            return result
 
     @staticmethod
     async def convert_workers_to_dto():
@@ -133,16 +118,14 @@ class AsyncORM:
             stmt = select(Worker).options(selectinload(Worker.resume))
             res = await session.execute(stmt)
             result = res.scalars().all()
-            print(f"{result=}")
             result_dto = [
                 WorkerRelDTO.model_validate(row, from_attributes=True) for row in result
             ]
-            print(f"{result_dto=}")
             return result_dto
 
     @staticmethod
     async def convert_workers_with_options_to_dto(
-        specialization: str, experience, work_type: WorkType
+            specialization: str, experience, work_type: WorkType
     ):
         async with async_session() as session:
             d = {
@@ -226,25 +209,23 @@ class AsyncORM:
                 )
             res = await session.execute(stmt)
             result = res.unique().scalars().all()
-            print(f"{result=}")
             result_dto = [
                 WorkerRelDTO.model_validate(row, from_attributes=True) for row in result
             ]
-            print(f"{result_dto=}")
             return result_dto
 
     @staticmethod
     async def creation_resume_for_worker_post(
-        title: str,
-        salary: int,
-        specialization: str,
-        employment: str,
-        experience: str,
-        work_type: str,
+            title: str,
+            salary: int,
+            specialization: str,
+            employment: str,
+            experience: str,
+            work_type: str,
     ):
         async with async_session() as session:
             resume_1 = Resume(
-                worker_id=2,
+                worker_id=1,
                 title=title,
                 salary=salary,
                 specialization=specialization,
@@ -256,6 +237,19 @@ class AsyncORM:
             await session.commit()
 
     @staticmethod
+    async def creation_vacancy(
+            title: str,
+            salary: int,
+    ):
+        async with async_session() as session:
+            vacancy = Vacancy(
+                title=title,
+                salary=salary,
+            )
+            session.add(vacancy)
+            await session.commit()
+
+    @staticmethod
     async def add_vacancies_and_replies(title: str, salary: int):
         async with async_session() as session:
             vacancy = Vacancy(title=title, salary=salary)
@@ -264,15 +258,8 @@ class AsyncORM:
                 .options(selectinload(Resume.vacancy_replied))
                 .filter_by(id=1)
             )
-            get_resume2 = (
-                select(Resume)
-                .options(selectinload(Resume.vacancy_replied))
-                .filter_by(id=2)
-            )
             resume_1 = (await session.execute(get_resume)).scalar_one()
-            resume_2 = (await session.execute(get_resume2)).scalar_one()
             resume_1.vacancy_replied.append(vacancy)
-            resume_2.vacancy_replied.append(vacancy)
             await session.commit()
 
     @staticmethod
@@ -281,7 +268,6 @@ class AsyncORM:
             stmt = select(Vacancy)
             res = await session.execute(stmt)
             result_orm = res.unique().scalars().all()
-            print(f"{result_orm=}")
             result_dto = [
                 VacanciesAddDTO.model_validate(row, from_attributes=True)
                 for row in result_orm
@@ -299,12 +285,10 @@ class AsyncORM:
 
             res = await session.execute(stmt)
             result_orm = res.unique().scalars().all()
-            print(f"{result_orm[0]=}")
             result_dto = [
                 ResumesRelVacanciesRepliedWithoutVacancyCompensationDTO.model_validate(
                     row, from_attributes=True
                 )
                 for row in result_orm
             ]
-            print(f"{result_dto[0]=}")
             return result_dto

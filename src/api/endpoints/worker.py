@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse, Response
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from fastapi_cache.decorator import cache
 
-from src.database.models import WorkType, ExperienceFilter, Employment
+from src.database.models import WorkType, ExperienceFilter, Employment, Sex
 from src.database.queries.orm import AsyncORM
 
 router = APIRouter()
@@ -13,6 +13,12 @@ router = APIRouter()
 async def getting_workers_from_db():
     workers = await AsyncORM.convert_workers_to_dto()
     return workers
+
+
+@router.post("/create_worker")
+async def create_worker(first_name: str, last_name: str, sex: Sex):
+    worker = await AsyncORM.insert_worker(first_name, last_name, sex)
+    return worker
 
 
 @router.get("/resumes_filtration")
@@ -26,7 +32,8 @@ async def getting_resumes_due_filters(specialization: str = None, experience: Ex
 
 
 @router.post("/create_resume")
-async def creation_worker_resume(title: str, salary: int, specialization: str = None, employment: Employment = None,
+async def creation_worker_resume(title: str, salary: int, specialization: str = None,
+                                 employment: Employment = None,
                                  experience: int = None, work_type: WorkType = None):
     await AsyncORM.creation_resume_for_worker_post(title, salary, specialization, employment,
                                                    experience, work_type)
@@ -35,7 +42,7 @@ async def creation_worker_resume(title: str, salary: int, specialization: str = 
 
 @router.post("/create_vacancy")
 async def creation_vacancy(title: str, salary: int):
-    await AsyncORM.add_vacancies_and_replies(title, salary)
+    await AsyncORM.creation_vacancy(title, salary)
     return JSONResponse(status_code=201, content={"msg": "Created!"})
 
 

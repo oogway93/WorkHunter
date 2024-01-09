@@ -19,4 +19,3 @@ SMTP_USER = os.environ.get("SMTP_USER")
 REDIS_HOST = os.environ.get("REDIS_HOST")
 
 async_link = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-link = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"

@@ -11,8 +11,8 @@ services:
       - "8000:8000"
     depends_on:
       - redis
-      - postgres
-    command: "uvicorn src.core:app --reload --host 0.0.0.0"
+      - db
+    command: bash -c "alembic upgrade head && uvicorn src.core:app --reload --host 0.0.0.0"
     networks:
       - db_net
     env_file:
@@ -38,22 +38,20 @@ services:
     depends_on:
       - webapp
       - redis
-      - postgres
+      - db
     restart: on-failure
-    #    env_file:
-    #      - ./.env
     networks:
       - db_net
 
-  postgres:
-    container_name: postgres
+  db:
+    container_name: db
     image: postgres:latest
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
     env_file:
       - ./.env
-    ports:
-      - "5431:5432"
     networks:
       - db_net
 

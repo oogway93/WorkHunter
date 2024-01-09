@@ -16,7 +16,6 @@ from src.auth.database import User
 from src.auth.manager import get_user_manager
 from src.auth.schemas import UserCreate
 from src.auth.schemas import UserRead
-from src.database.queries.orm import AsyncORM
 
 sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
@@ -54,11 +53,12 @@ async def startup():
 
 
 async def main():
-    await AsyncORM.create_tables()
-    await AsyncORM.insert_worker()
-    await AsyncORM.insert_resumes()
-    await AsyncORM.insert_vacancies()
-    await AsyncORM.insert_vacancy_replies()
+    # await AsyncORM.create_tables()
+    # await AsyncORM.insert_worker()
+    # await AsyncORM.insert_resumes()
+    # await AsyncORM.insert_vacancies()
+    # await AsyncORM.insert_vacancy_replies()
+    pass
 
 
 if __name__ == "__main__":
