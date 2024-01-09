@@ -19,7 +19,7 @@ from src.auth.schemas import UserRead
 
 sys.path.insert(1, os.path.join(sys.path[0], ".."))
 
-app = FastAPI()
+app = FastAPI(title="Work Hunter", description="Work Hunter is a analog of hh.ru", version="v1")
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,

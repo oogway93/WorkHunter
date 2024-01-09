@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-router = APIRouter()
+router = APIRouter(tags=["Main Page"])
 
 
 @router.get("/")
