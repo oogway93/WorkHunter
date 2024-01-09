@@ -55,6 +55,18 @@ services:
     networks:
       - db_net
 
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    depends_on:
+      - webapp
+    ports:
+      - "8082:80"
+    volumes:
+      - ./nginx:/etc/nginx/nginx
+    networks:
+      - db_net
+
 volumes:
   postgres_data:
 networks:
